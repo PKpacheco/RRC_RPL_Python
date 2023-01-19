@@ -40,12 +40,11 @@ class BusWinnipeg():
         url_stop = self.url_base+ api_stop
         request_stop = requests.get(url_stop)
         json_stop = json.loads(request_stop.text)
-
+        print("--------------------------------------- \n")
         print("Stops available", distance,"from the coodinates (",lat, long,"):" )
         for i in json_stop['stops']:
             print(i['key'], '  ', i['name'])
 
-# result: scheduled and estimated   
     def fetch_schedule(self,
                        bus_stop, 
                        ):
@@ -53,10 +52,14 @@ class BusWinnipeg():
         url_schedule = self.url_base + api_schedule
         request_schedule = requests.get(url_schedule)
         schedule_json = json.loads(request_schedule.text)
-        item_list = ['scheduled', 'estimated'] 
-        import ipdb;ipdb.set_trace()
-        for i in schedule_json['stop-schedule']:
-            print(i['scheduled'], '  ', i['estimated'])
+        print("--------------------------------------- \n")
+        print("Stop number: ", bus_stop)
+        print("Arrival times:")
+        for route in schedule_json['stop-schedule']['route-schedules']:
+            for st in route['scheduled-stops']:
+                schedule = (st['times']['arrival']['scheduled'])
+                estimated = (st['times']['arrival']['estimated'])
+                print("Scheduled: ", schedule,"      " "Estimated:", estimated)
 
 
 if __name__ == "__main__":
@@ -66,10 +69,10 @@ if __name__ == "__main__":
     bw = BusWinnipeg()
 
     if option_user == 1:
-        lat_long_input = int(input("Press 1 for random coordinates, Press 2 for input the coordinates "))
+        lat_long_input = int(input("Press 1 for DEAFULT coordinates, Press 2 for INPUT the coordinates "))
         if lat_long_input == 1:
-            long = 49.895
-            lat = -97.138
+            lat = 49.896
+            long = -97.138
             distance = 200
 
         elif lat_long_input == 2:
@@ -82,7 +85,7 @@ if __name__ == "__main__":
         bw.fetch_stops (long, lat, distance)
 
     elif option_user == 2:
-        bus_stop = input("Enter the  stop number:")
+        bus_stop = input("Enter the  stop number: (example: 10171, 10066, 10185)")
         bw.fetch_schedule(bus_stop)
 
     else:
